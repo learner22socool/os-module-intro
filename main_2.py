@@ -1,98 +1,113 @@
-# import os
-# if (not os.path.exists("data")):
-#  os.mkdir("data")
-# for i in range(0,100):
-#     # os.rename(f"data\date{i+1}",f"data/tutorial{i+1}")
-#     os.mkdir(f"data/date{i+1}")
-    
-    
-# f=open('myfile.txt','r')   
-# text=f.read()
-# print(text)
+import datetime
+
+# -------------------- Patient Class --------------------
+class Patient:
+    def __init__(self, patient_id, name, age, gender, disease):
+        self.patient_id = patient_id
+        self.name = name
+        self.age = age
+        self.gender = gender
+        self.disease = disease
+
+    def get_details(self):
+        return f"{self.patient_id},{self.name},{self.age},{self.gender},{self.disease}"
 
 
-# 
+# -------------------- Billing Class --------------------
+class Billing:
+    def __init__(self, consultation_fee, medicine_fee, room_charges):
+        self.consultation_fee = consultation_fee
+        self.medicine_fee = medicine_fee
+        self.room_charges = room_charges
+
+    def calculate_total(self):
+        return self.consultation_fee + self.medicine_fee + self.room_charges
 
 
-# class Book():
-#     def __init__(self,title, author, pages):
-#      self.title=title
-#      self.author=author
-#      self.pages=pages
-#     def is_big_book(self):
-        
-#     #  print(f"THE NAME OF THIS BOOK IS{self.title},AND THE AUTHOR IS {self.author}, IT IS OVER {self.pages} PAGES ")
-#      if self.pages>300:
-#         return True
-#      else :
-#         return False
-# book1=Book("GOBLET OF FIRE","J.K ROWLING",400)   
-# book2=Book("DAY IN MUSSORI","RUSKIN BOND",200)  
+# -------------------- Hospital Management System --------------------
+class HospitalManagementSystem:
+    def __init__(self, filename="patient_records.txt"):
+        self.filename = filename
 
-# print(book1.is_big_book()) 
-# print(book2.is_big_book())    
+    def add_patient(self):
+        try:
+            patient_id = input("Enter Patient ID: ")
+            name = input("Enter Patient Name: ")
+            age = int(input("Enter Age: "))
+            gender = input("Enter Gender: ")
+            disease = input("Enter Disease: ")
+
+            patient = Patient(patient_id, name, age, gender, disease)
+
+            consultation_fee = float(input("Enter Consultation Fee: "))
+            medicine_fee = float(input("Enter Medicine Fee: "))
+            room_charges = float(input("Enter Room Charges: "))
+
+            billing = Billing(consultation_fee, medicine_fee, room_charges)
+            total_bill = billing.calculate_total()
+
+            date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            record = (
+                patient.get_details()
+                + f",{consultation_fee},{medicine_fee},{room_charges},{total_bill},{date}\n"
+            )
+
+            with open(self.filename, "a") as file:
+                file.write(record)
+
+            print("\nPatient record added successfully.")
+            print(f"Total Bill Amount: ₹{total_bill}")
+
+        except ValueError:
+            print("Invalid input. Please enter numeric values where required.")
+        except Exception as e:
+            print("An error occurred:", e)
+
+    def view_records(self):
+        try:
+            with open(self.filename, "r") as file:
+                records = file.readlines()
+
+            if not records:
+                print("No patient records found.")
+                return
+
+            print("\n--- Patient Records ---")
+            for record in records:
+                data = record.strip().split(",")
+                print(
+                    f"ID: {data[0]} | Name: {data[1]} | Age: {data[2]} | "
+                    f"Gender: {data[3]} | Disease: {data[4]} | "
+                    f"Total Bill: ₹{data[8]} | Date: {data[9]}"
+                )
+
+        except FileNotFoundError:
+            print("No records file found.")
+        except Exception as e:
+            print("An error occurred:", e)
+
+    def run(self):
+        while True:
+            print("\n--- Hospital Management System ---")
+            print("1. Add Patient Record")
+            print("2. View Patient Records")
+            print("3. Exit")
+
+            choice = input("Enter your choice: ")
+
+            if choice == "1":
+                self.add_patient()
+            elif choice == "2":
+                self.view_records()
+            elif choice == "3":
+                print("Exiting system. Thank you.")
+                break
+            else:
+                print("Invalid choice. Please try again.")
 
 
-
-# def my_decorator(func):
-#     def wrapper():
-#      print("staring...")   
-#      func()
-#      print("done!")    
-#     return wrapper
-
-
-# @my_decorator
-# def name():
-#     print("ANIRUDH")     
-# name()      
-
-# def my_decorator(func):
-#     def wrapper():
-#      print("")
-#      func()
-#      print()
-#     return wrapper
-
-# @my_decorator
-# def time():
-#     print("")
-# time()    
-
-
-# class calculator():
-#     @staticmethod
-#     def solve(a,b):
-#         return a+b ,a-b,a/b,a*b
-    
-# print(calculator.solve(2,3))    
-
-
-# class StringUtlis():
-#      @staticmethod
-#      def is_palindrome(string):
-#          return string==string[::-1]
-     
-# print(StringUtlis.is_palindrome("mom"))     
-
-class car():
-    car_wheel=4
-    def __init__(self,model,brand):
-        self.model=model
-        self.brand=brand
-       
-        
-    def callin(self)    :
-        print(f"its {self.model} and it belong to the brand {self.brand} it is equipped with {self.car_wheel} wheels ")
-        
-        
-c1=car("2022 XRZ","MASSARATI")    
-c1.callin()
-# print(f"comes with {c1.car_wheel}")
-c2=car("2025 R400","NIMSUM")    
-c2.callin() 
-# print(f"comes with {c2.car_wheel} wheels")
-
-print(dir(c1))      # shows all attributes and methods
-print(c1.__dict__)  # shows instance variables only
-help(car)          
+# -------------------- Main Execution --------------------
+if __name__ == "__main__":
+    system = HospitalManagementSystem()
+    system.run()
